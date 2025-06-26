@@ -69,7 +69,7 @@ class EpreuveController extends Controller
         return view('admin.epreuve.show', compact('epreuve', 'event','epreuves'));
     }
 
-
+aaaaaaaaaaaaaaaaaa
 
         // Show form to edit epreuve    // Show form to edit epreuve    // Show form to edit epreuve
 public function edit($eventId, $epreuveId)
