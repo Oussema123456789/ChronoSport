@@ -69,8 +69,9 @@ class EpreuveController extends Controller
         return view('admin.epreuve.show', compact('epreuve', 'event','epreuves'));
     }
 
-fffffffffffffff
-    // Show form to edit epreuve
+
+
+        // Show form to edit epreuve    // Show form to edit epreuve    // Show form to edit epreuve
 public function edit($eventId, $epreuveId)
 {
     $epreuve = Epreuve::where('evenement_id', $eventId)
