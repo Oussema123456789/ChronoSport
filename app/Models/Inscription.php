@@ -21,8 +21,7 @@ class Inscription extends Model
         'cin',
         'genre',
         'nationalite',
-        'club',
-        'dossard'
+        'club'
     ];
 
     public function epreuve()

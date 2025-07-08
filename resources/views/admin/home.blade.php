@@ -451,6 +451,18 @@
         <li><a href="{{ route('evenements.create') }}"><i class="bx bx-plus-circle"></i> Add New Evenements</a></li>
     </ul>
 </li>
+<li>
+    <a href="javascript:;" class="has-arrow">
+        <div class="parent-icon">
+            <i class="bx bx-calendar"></i> <!-- Icon for Evenement -->
+        </div>
+        <div class="menu-title">Dossard</div>
+    </a>
+    <ul>
+        <li><a href="{{ route('admin.event.index') }}"><i class="bx bx-detail"></i> Evenement Details</a></li>
+        <li><a href="{{ route('evenements.create') }}"><i class="bx bx-plus-circle"></i> Add New Evenements</a></li>
+    </ul>
+</li>
 
 <li>
     <a href="javascript:;" class="has-arrow">

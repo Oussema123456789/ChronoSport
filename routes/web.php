@@ -22,7 +22,9 @@ use App\Http\Controllers\OrganisateurController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrganisateurAdminController;
 use App\Http\Controllers\DiplomeController;
+use App\Http\Controllers\DossardController;
 use App\Http\Controllers\PublicEventController;
+use App\Http\Controllers\FormConfigurationController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -90,6 +92,13 @@ Route::post('/inscription-en-ligne/epreuve/{epreuve}', [InscriptionController::c
 Route::get('/inscriptions', [InscriptionController::class, 'listInscriptions'])->name('inscriptions');
 
 Route::get('/inscriptions/list/{event}/{epreuve}', [InscriptionController::class, 'index'])->name('inscriptions.index');
+
+// Routes pour la gestion complète des inscriptions par l'admin
+Route::get('/admin/inscriptions/create/{event}/{epreuve}', [InscriptionController::class, 'adminCreate'])->name('admin.inscriptions.create');
+Route::post('/admin/inscriptions/store', [InscriptionController::class, 'adminStore'])->name('admin.inscriptions.store');
+Route::get('/admin/inscriptions/edit/{event}/{epreuve}/{inscription}', [InscriptionController::class, 'adminEdit'])->name('admin.inscriptions.edit');
+Route::put('/admin/inscriptions/update/{event}/{epreuve}/{inscription}', [InscriptionController::class, 'adminUpdate'])->name('admin.inscriptions.update');
+Route::delete('/admin/inscriptions/destroy/{event}/{epreuve}/{inscription}', [InscriptionController::class, 'adminDestroy'])->name('admin.inscriptions.destroy');
 
 
 
@@ -222,6 +231,23 @@ Route::get('/resultatx/{event}', function (Event $event) {
 
 
 
+//dossard
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+    Route::get('/dossards', [DossardController::class, 'index'])->name('dossards.index');
+    Route::get('/dossards/create', [DossardController::class, 'create'])->name('dossards.create');
+    Route::post('/dossards/generate', [DossardController::class, 'generate'])->name('dossards.generate');
+    Route::get('/dossards/download-list', [DossardController::class, 'downloadList'])->name('dossards.download.list');
+    Route::get('/dossards/download-single', [DossardController::class, 'downloadSingle'])->name('dossards.download.single');
+
+    // Configuration des formulaires
+    Route::get('/form-config/{event}/edit', [FormConfigurationController::class, 'edit'])->name('form-config.edit');
+    Route::put('/form-config/{event}', [FormConfigurationController::class, 'update'])->name('form-config.update');
+    Route::get('/form-config/{event}/reset', [FormConfigurationController::class, 'reset'])->name('form-config.reset');
+});
+
+// Route de test temporaire sans authentification
+Route::get('/test-form-config/{event}/edit', [FormConfigurationController::class, 'edit'])->name('test.form-config.edit');
+Route::put('/test-form-config/{event}', [FormConfigurationController::class, 'update'])->name('test.form-config.update');
 //diplome
 Route::get('/diplome/{id}', [ResultatController::class, 'downloadDiplome'])->name('diplome.show');
 

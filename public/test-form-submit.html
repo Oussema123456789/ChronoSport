@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Soumission Configuration</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+    <h2>Test de soumission de configuration</h2>
+    
+    <form action="/admin/form-config/1" method="POST">
+        <input type="hidden" name="_token" value="test-token">
+        <input type="hidden" name="_method" value="PUT">
+        
+        <h3>Configuration des champs :</h3>
+        
+        <!-- Nom -->
+        <div>
+            <label>Nom :</label>
+            <input type="hidden" name="fields[nom][enabled]" value="0">
+            <input type="checkbox" name="fields[nom][enabled]" value="1" checked> Activé
+            
+            <input type="hidden" name="fields[nom][required]" value="0">
+            <input type="checkbox" name="fields[nom][required]" value="1" checked> Obligatoire
+        </div>
+        
+        <!-- Prénom -->
+        <div>
+            <label>Prénom :</label>
+            <input type="hidden" name="fields[prenom][enabled]" value="0">
+            <input type="checkbox" name="fields[prenom][enabled]" value="1" checked> Activé
+            
+            <input type="hidden" name="fields[prenom][required]" value="0">
+            <input type="checkbox" name="fields[prenom][required]" value="1"> Obligatoire
+        </div>
+        
+        <!-- Email -->
+        <div>
+            <label>Email :</label>
+            <input type="hidden" name="fields[email][enabled]" value="0">
+            <input type="checkbox" name="fields[email][enabled]" value="1" checked> Activé
+            
+            <input type="hidden" name="fields[email][required]" value="0">
+            <input type="checkbox" name="fields[email][required]" value="1" checked> Obligatoire
+        </div>
+        
+        <!-- Téléphone -->
+        <div>
+            <label>Téléphone :</label>
+            <input type="hidden" name="fields[telephone][enabled]" value="0">
+            <input type="checkbox" name="fields[telephone][enabled]" value="1"> Activé
+            
+            <input type="hidden" name="fields[telephone][required]" value="0">
+            <input type="checkbox" name="fields[telephone][required]" value="1"> Obligatoire
+        </div>
+        
+        <!-- Date de naissance -->
+        <div>
+            <label>Date de naissance :</label>
+            <input type="hidden" name="fields[date_naissance][enabled]" value="0">
+            <input type="checkbox" name="fields[date_naissance][enabled]" value="1" checked> Activé
+            
+            <input type="hidden" name="fields[date_naissance][required]" value="0">
+            <input type="checkbox" name="fields[date_naissance][required]" value="1"> Obligatoire
+        </div>
+        
+        <!-- CIN -->
+        <div>
+            <label>CIN :</label>
+            <input type="hidden" name="fields[cin][enabled]" value="0">
+            <input type="checkbox" name="fields[cin][enabled]" value="1" checked> Activé
+            
+            <input type="hidden" name="fields[cin][required]" value="0">
+            <input type="checkbox" name="fields[cin][required]" value="1" checked> Obligatoire
+        </div>
+        
+        <!-- Genre -->
+        <div>
+            <label>Genre :</label>
+            <input type="hidden" name="fields[genre][enabled]" value="0">
+            <input type="checkbox" name="fields[genre][enabled]" value="1" checked> Activé
+            
+            <input type="hidden" name="fields[genre][required]" value="0">
+            <input type="checkbox" name="fields[genre][required]" value="1"> Obligatoire
+        </div>
+        
+        <!-- Nationalité -->
+        <div>
+            <label>Nationalité :</label>
+            <input type="hidden" name="fields[nationalite][enabled]" value="0">
+            <input type="checkbox" name="fields[nationalite][enabled]" value="1" checked> Activé
+            
+            <input type="hidden" name="fields[nationalite][required]" value="0">
+            <input type="checkbox" name="fields[nationalite][required]" value="1"> Obligatoire
+        </div>
+        
+        <!-- Club -->
+        <div>
+            <label>Club :</label>
+            <input type="hidden" name="fields[club][enabled]" value="0">
+            <input type="checkbox" name="fields[club][enabled]" value="1" checked> Activé
+            
+            <input type="hidden" name="fields[club][required]" value="0">
+            <input type="checkbox" name="fields[club][required]" value="1"> Obligatoire
+        </div>
+        
+        <br>
+        <button type="submit">Sauvegarder Configuration</button>
+    </form>
+    
+    <script>
+    // Simuler le token CSRF
+    document.querySelector('input[name="_token"]').value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    </script>
+</body>
+</html>

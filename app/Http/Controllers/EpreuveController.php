@@ -61,7 +61,9 @@ class EpreuveController extends Controller
     // Show details for a specific epreuve
     public function show($event, $epreuve)
     {
-        $epreuve = Epreuve::where('evenement_id',operator: $event)->findOrFail($epreuve);
+        $epreuve = Epreuve::where('evenement_id', $event)
+                          ->with('inscriptions') // Charger les inscriptions
+                          ->findOrFail($epreuve);
         $epreuves = Epreuve::where('evenement_id', $event)->get();
 
         $event = Event::findOrFail($event);
@@ -69,7 +71,6 @@ class EpreuveController extends Controller
         return view('admin.epreuve.show', compact('epreuve', 'event','epreuves'));
     }
 
-aaaaaaaaaaaaaaaaaa
 
         // Show form to edit epreuve    // Show form to edit epreuve    // Show form to edit epreuve
 public function edit($eventId, $epreuveId)

@@ -7,25 +7,42 @@ use App\Models\User;
 use App\Models\Epreuve;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 class EventController extends Controller
 {
 public function index(Request $request)
 {
-    $search = $request->input('search'); // Get the search input
+    $search = $request->input('search');
 
-    $evenements = Event::where('user_id', auth()->id()) // Filter only user's events
-        ->when($search, function ($query, $search) {
-            return $query->where(function ($subQuery) use ($search) {
-                $subQuery->where('nom', 'like', "%{$search}%")
-                         ->orWhere('ville', 'like', "%{$search}%")
-                         ->orWhere('type', 'like', "%{$search}%");
-            });
-        })
-        ->orderBy('date', 'desc')
-        ->paginate(10);
+    // Vérifier si l'utilisateur est admin
+    if (Auth::check() && Auth::user()->role === 'admin') {
+        // Admin : voir tous les événements
+        $evenements = Event::when($search, function ($query, $search) {
+                return $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('nom', 'like', "%{$search}%")
+                             ->orWhere('ville', 'like', "%{$search}%")
+                             ->orWhere('type', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('date', 'desc')
+            ->paginate(10);
+    } else {
+        // Non-admin : voir uniquement ses propres événements
+        $evenements = Event::where('user_id', Auth::id())
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('nom', 'like', "%{$search}%")
+                             ->orWhere('ville', 'like', "%{$search}%")
+                             ->orWhere('type', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('date', 'desc')
+            ->paginate(10);
+    }
 
     return view('admin.event.index', compact('evenements'));
 }
+
 
 
 
@@ -52,42 +69,103 @@ public function index(Request $request)
 
     public function store(Request $request)
 {
-    $validated = $request->validate([
-        'nom' => 'required|string|max:255',
-        'pays' => 'required|string|max:255',
-        'ville' => 'nullable|string|max:255',
-        'adresse' => 'nullable|string',
-        'date' => 'required|date',
-        'image_couverture' => 'required|nullable|image|mimes:jpg,jpeg,png',
-        'image_profile' => 'required|nullable|image|mimes:jpg,jpeg,png',
-        'type' => 'required|nullable|string',
-        'latitude' => 'nullable|numeric',
-        'longitude' => 'nullable|numeric',
-        'email' => 'required|nullable|email',
-        'site_web' => 'nullable|string',
-        'tel' => 'required|nullable|string',
-        'facebook' => 'nullable|string',
-        'instagram' => 'nullable|string',
-        'youtube' => 'nullable|string',
-        'description' => 'required|nullable|string',
-        'reglement' => 'nullable|file',
-    ]);
+        try {
+            // Debug: Log pour voir si la méthode est appelée
+            Log::info('EventController store method called', [
+                'has_epreuves' => $request->has('epreuves'),
+                'epreuves_data' => $request->input('epreuves')
+            ]);
 
-    if ($request->hasFile('image_couverture')) {
-        $validated['image_couverture'] = $request->file('image_couverture')->store('images', 'public');
+            // Validation de base pour l'événement
+            $eventValidated = $request->validate([
+                'nom' => 'required|string|max:255',
+                'pays' => 'required|string|max:255',
+                'ville' => 'nullable|string|max:255',
+                'adresse' => 'nullable|string',
+                'date' => 'required|date',
+                'image_couverture' => 'required|nullable|image|mimes:jpg,jpeg,png',
+                'image_profile' => 'required|nullable|image|mimes:jpg,jpeg,png',
+                'type' => 'required|nullable|string',
+                'latitude' => 'nullable|numeric',
+                'longitude' => 'nullable|numeric',
+                'email' => 'required|nullable|email',
+                'site_web' => 'nullable|string',
+                'tel' => 'required|nullable|string',
+                'facebook' => 'nullable|string',
+                'instagram' => 'nullable|string',
+                'youtube' => 'nullable|string',
+                'description' => 'required|nullable|string',
+                'reglement' => 'nullable|file',
+            ]);
+
+            // Gestion des fichiers
+            if ($request->hasFile('image_couverture')) {
+                $eventValidated['image_couverture'] = $request->file('image_couverture')->store('images', 'public');
+            }
+
+            if ($request->hasFile('image_profile')) {
+                $eventValidated['image_profile'] = $request->file('image_profile')->store('images', 'public');
+            }
+
+            if ($request->hasFile('reglement')) {
+                $eventValidated['reglement'] = $request->file('reglement')->store('reglements', 'public');
+            }
+
+            // Ajouter l'ID de l'utilisateur
+            $eventValidated['user_id'] = Auth::id();
+
+            // Créer l'événement
+            $event = Event::create($eventValidated);
+            Log::info('Event created successfully', ['event_id' => $event->id]);
+
+            // Traiter les épreuves
+            $epreuvesCreated = 0;
+            if ($request->has('epreuves') && is_array($request->input('epreuves'))) {
+                foreach ($request->input('epreuves') as $index => $epreuveData) {
+                    Log::info('Processing epreuve', ['index' => $index, 'data' => $epreuveData]);
+
+                    // Vérifier que les champs essentiels sont remplis
+                    if (!empty($epreuveData['nom']) &&
+                        !empty($epreuveData['tarif']) &&
+                        !empty($epreuveData['genre']) &&
+                        !empty($epreuveData['date_debut']) &&
+                        !empty($epreuveData['date_fin']) &&
+                        !empty($epreuveData['inscription_date_debut']) &&
+                        !empty($epreuveData['inscription_date_fin'])) {
+
+                        $epreuve = Epreuve::create([
+                            'evenement_id' => $event->id,
+                            'nom' => $epreuveData['nom'],
+                            'tarif' => (float)$epreuveData['tarif'],
+                            'genre' => $epreuveData['genre'],
+                            'date_debut' => $epreuveData['date_debut'],
+                            'date_fin' => $epreuveData['date_fin'],
+                            'inscription_date_debut' => $epreuveData['inscription_date_debut'],
+                            'inscription_date_fin' => $epreuveData['inscription_date_fin'],
+                            'publier_resultat' => isset($epreuveData['publier_resultat']) && $epreuveData['publier_resultat'] == '1',
+                        ]);
+
+                        $epreuvesCreated++;
+                        Log::info('Epreuve created successfully', ['epreuve_id' => $epreuve->id]);
+                    } else {
+                        Log::warning('Epreuve skipped due to missing data', ['index' => $index, 'data' => $epreuveData]);
+                    }
+                }
+            }
+
+            $message = "Événement créé avec succès";
+            if ($epreuvesCreated > 0) {
+                $message .= " avec {$epreuvesCreated} épreuve(s)";
+            }
+
+          // ✅ Redirection corrigée ici :
+            return redirect()->route('admin.event.index')->with('success', $message);
+
+        } catch (\Exception $e) {
+            Log::error('Error in EventController store', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return redirect()->back()->withErrors(['error' => 'Une erreur est survenue: ' . $e->getMessage()])->withInput();
+        }
     }
-
-    if ($request->hasFile('image_profile')) {
-        $validated['image_profile'] = $request->file('image_profile')->store('images', 'public');
-    }
-
-    // Add user_id to associate the event with the authenticated user
-    $validated['user_id'] = Auth::id();
-
-    Event::create($validated);
-
-    return redirect()->back()->with('success', 'Événement ajouté avec succès.');
-}
 public function show(Event $event)
 {
     $event->load('sponsors'); // Eager load sponsors
@@ -164,4 +242,5 @@ if ($request->hasFile('reglement')) {
         $event = Event::with('arbitres')->findOrFail($eventId);
         return view('admin.arbitre.arbitres', compact('event'));
     }
+
 }

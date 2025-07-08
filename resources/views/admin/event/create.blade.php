@@ -7,6 +7,17 @@
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
+
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <h6>Erreurs de validation :</h6>
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 <div class="row">
     <div class="col-xl-8 mx-auto">
         <h6 class="mb-0 text-uppercase">Ajout d'Événement</h6>
@@ -203,10 +214,36 @@
                                         @enderror
                                     </div>
 
-                                    <!-- Submit -->
-                                    <div class="col-12 mt-3">
-                                        <button type="submit" class="btn btn-primary">Enregistrer</button>
-                                    </div>
+                                </div>
+
+                            </div> <!-- .p-4 -->
+                        </div> <!-- .card-body -->
+                    </div> <!-- .card -->
+
+                    <!-- Section Épreuves -->
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <div class="p-4 border rounded">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0 text-primary">
+                                        <i class="bx bx-flag me-2"></i>Épreuves de l'événement
+                                    </h5>
+                                    <button type="button" class="btn btn-success btn-sm" id="addEpreuveBtn">
+                                        <i class="bx bx-plus"></i> Ajouter une épreuve
+                                    </button>
+                                </div>
+
+                                <div id="epreuvesContainer">
+                                    <!-- Les épreuves seront ajoutées ici dynamiquement -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="col-12 mt-3">
+                        <button type="submit" class="btn btn-primary">Enregistrer l'événement et les épreuves</button>
+                    </div>
 
                                 </div>
 
@@ -342,6 +379,121 @@
             @endif
         @endif
     });
+</script>
+
+<script>
+    // Gestion des épreuves dynamiques
+    let epreuveCounter = 0;
+
+    document.getElementById('addEpreuveBtn').addEventListener('click', function() {
+        addEpreuveForm();
+    });
+
+    function addEpreuveForm() {
+        epreuveCounter++;
+        const container = document.getElementById('epreuvesContainer');
+
+        const epreuveDiv = document.createElement('div');
+        epreuveDiv.className = 'epreuve-form border p-3 mb-3 rounded';
+        epreuveDiv.id = `epreuve-${epreuveCounter}`;
+
+        epreuveDiv.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0 text-secondary">Épreuve ${epreuveCounter}</h6>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeEpreuve(${epreuveCounter})">
+                    <i class="bx bx-trash"></i> Supprimer
+                </button>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Nom de l'épreuve</label>
+                    <input type="text" name="epreuves[${epreuveCounter}][nom]" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Tarif (€)</label>
+                    <input type="number" step="0.01" name="epreuves[${epreuveCounter}][tarif]" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Genre</label>
+                    <select name="epreuves[${epreuveCounter}][genre]" class="form-select" required>
+                        <option value="">Choisir le genre</option>
+                        <option value="male">Homme</option>
+                        <option value="female">Femme</option>
+                        <option value="mixte">Mixte</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Date Début</label>
+                    <input type="datetime-local" name="epreuves[${epreuveCounter}][date_debut]" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Date Fin</label>
+                    <input type="datetime-local" name="epreuves[${epreuveCounter}][date_fin]" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Début Inscriptions</label>
+                    <input type="datetime-local" name="epreuves[${epreuveCounter}][inscription_date_debut]" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Fin Inscriptions</label>
+                    <input type="datetime-local" name="epreuves[${epreuveCounter}][inscription_date_fin]" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Publier Résultat</label>
+                    <select name="epreuves[${epreuveCounter}][publier_resultat]" class="form-select">
+                        <option value="0">Non</option>
+                        <option value="1">Oui</option>
+                    </select>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(epreuveDiv);
+    }
+
+    function removeEpreuve(id) {
+        const epreuveDiv = document.getElementById(`epreuve-${id}`);
+        if (epreuveDiv) {
+            epreuveDiv.remove();
+        }
+    }
+
+    // Ajouter automatiquement une première épreuve
+    document.addEventListener('DOMContentLoaded', function() {
+        addEpreuveForm();
+    });
+
+    // Fonction de debug pour voir les données du formulaire
+    function debugForm() {
+        const form = document.querySelector('form');
+        const formData = new FormData(form);
+
+        console.log('=== DEBUG FORM DATA ===');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ': ' + value);
+        }
+
+        // Afficher spécifiquement les épreuves
+        const epreuves = {};
+        for (let [key, value] of formData.entries()) {
+            if (key.startsWith('epreuves[')) {
+                epreuves[key] = value;
+            }
+        }
+
+        console.log('=== EPREUVES DATA ===');
+        console.log(epreuves);
+
+        alert('Données du formulaire affichées dans la console (F12)');
+    }
 </script>
 @endpush
 

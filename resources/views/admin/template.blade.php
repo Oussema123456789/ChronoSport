@@ -8,6 +8,7 @@
 	<!-- Required meta tags -->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<!--favicon-->
 	<link href="{{URL::asset('img/logoentete.png')}}" rel="icon" type="image/png">
 	<!--plugins-->
@@ -445,6 +446,7 @@
         </ul>
     </li>
 
+    @if(isset($event))
     <li>
         <a href="javascript:;" class="has-arrow">
             <div class="parent-icon"><i class='bx bx-run'></i></div>
@@ -464,7 +466,35 @@
         </ul>
     </li>
 
+    <li>
+        <a href="{{ route('admin.form-config.edit', $event->id) }}">
+            <div class="parent-icon"><i class='bx bx-cog'></i></div>
+            <div class="menu-title">Configuration Formulaire</div>
+        </a>
+    </li>
+    @endif
+
+    <li>
+        <a href="javascript:;" class="has-arrow">
+            <div class="parent-icon"><i class='bx bx-id-card'></i></div>
+            <div class="menu-title">Dossards</div>
+        </a>
+        <ul>
+            <li>
+                <a href="{{ route('admin.dossards.index') }}">
+                    <i class="bx bx-list-ul"></i>Gestion des Dossards
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.dossards.create') }}">
+                    <i class="bx bx-plus-circle"></i>Concevoir Dossards
+                </a>
+            </li>
+        </ul>
+    </li>
+
     <li class="menu-label">Résultat</li>
+@if(isset($epreuves))
 <li>
     <a href="javascript:;" class="has-arrow">
         <div class="parent-icon"><i class='bx bx-bar-chart-alt-2'></i></div>
@@ -480,6 +510,7 @@
             @endforeach
     </ul>
 </li>
+@endif
 
 
     <li>
@@ -495,6 +526,7 @@
     </li>
 
     <li class="menu-label">Événement</li>
+    @if(isset($event) && isset($epreuves))
     <li>
         <a href="javascript:;" class="has-arrow">
             <div class="parent-icon"><i class='bx bx-pen'></i></div>
@@ -510,6 +542,7 @@
             @endforeach
         </ul>
     </li>
+    @endif
 
     <li>
         <a href="javascript:;" class="has-arrow">
@@ -525,6 +558,7 @@
 
                 </li>
 
+                @if(isset($event))
                 <li>
                     <a href="javascript:;" class="has-arrow">
                         <div class="parent-icon"><i class="bx bx-building-house"></i></div>
@@ -543,6 +577,7 @@
                         </li>
                     </ul>
                 </li>
+                @endif
 
 
 
