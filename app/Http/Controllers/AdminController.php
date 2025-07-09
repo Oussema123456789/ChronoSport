@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Epreuve;
 use App\Models\Inscription;
+use App\Models\Sponsor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -60,16 +61,33 @@ return view('admin.home', [
 
 
 
-    public function template( $event)
+    public function template($event)
     {
-
         // Retrieve the event by its ID
         $evenements = Event::findOrFail($event);
-        // Get all epreuves related to this event
-        $epreuves = Epreuve::where('evenement_id', $event)->get();
+
+        // Get all epreuves related to this event with inscription count
+        $epreuves = Epreuve::where('evenement_id', $event)
+            ->withCount('inscriptions')
+            ->get();
+
+        // Get total inscriptions for this event
+        $totalInscriptions = \App\Models\Inscription::whereIn('epreuve_id', $epreuves->pluck('id'))->count();
+
+        // Get sponsors for this event
+        $sponsors = \App\Models\Sponsor::where('evenement_id', $event)->get();
+
+        // Get arbitres for this event (users with role 'arbitre' assigned to this event)
+        $arbitres = $evenements->arbitres;
 
         // You can now pass this event to the view
-        return view('admin.template', ['event' => $evenements,'epreuves'=>$epreuves]);
+        return view('admin.event-dashboard', [
+            'event' => $evenements,
+            'epreuves' => $epreuves,
+            'totalInscriptions' => $totalInscriptions,
+            'sponsors' => $sponsors,
+            'arbitres' => $arbitres
+        ]);
     }
 
 public function template1()

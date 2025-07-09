@@ -115,6 +115,49 @@
             font-weight: bold;
         }
 
+        /* Cards */
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #0056b3, #004085);
+            transform: translateY(-2px);
+        }
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #1e7e34);
+            border: none;
+        }
+        .btn-success:hover {
+            background: linear-gradient(45deg, #1e7e34, #155724);
+            transform: translateY(-2px);
+        }
+
+        /* Stats section */
+        .border-end {
+            border-right: 1px solid #dee2e6 !important;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            .event-content {
+                margin-top: 60px;
+            }
+        }
+
         /* Footer */
         footer {
             background: #0c0c0c;
@@ -198,10 +241,12 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="#info">INFO</a>
+                    <a class="nav-link" href="{{ url()->previous() }}" onclick="history.back(); return false;">
+                        <i class="fas fa-arrow-left me-2"></i>Retour
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#inscription">INSCRIT</a>
+                    <a class="nav-link" href="{{ url('inscription-en-ligne') }}">Inscription</a>
                 </li>
             </ul>
         </div>
@@ -211,7 +256,11 @@
     <div class="hero-section">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-
+            <h1 class="display-4 fw-bold mb-3">{{ $event->nom }}</h1>
+            <p class="lead mb-4">{{ $event->type }} • {{ \Carbon\Carbon::parse($event->date)->format('d/m/Y') }}</p>
+            <a href="{{ url('inscription-en-ligne/' . $event->id . '/epreuves') }}" class="btn btn-primary btn-lg px-5 py-3">
+                <i class="fas fa-user-plus me-2"></i>S'inscrire maintenant
+            </a>
         </div>
     </div>
 
@@ -219,21 +268,87 @@
     <div class="container event-content" id="info">
         <div class="row g-5">
             <div class="col-lg-8">
-                <h1>Bienvenue a {{ $event->nom }} evenement</h1>
-                <div class="event-description">
+                <!-- Event Description -->
+                <div class="event-description mb-5">
+                    <h2 class="mb-4">À propos de l'événement</h2>
                     <p class="mb-0">{!! $event->description !!}</p>
+
                 </div>
+
+                <!-- Event Details -->
+                <div class="event-description mb-5">
+                    <h3 class="mb-4">Informations pratiques</h3>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-calendar-alt text-primary me-3 fs-5"></i>
+                                <div>
+                                    <strong>Date</strong><br>
+                                    {{ \Carbon\Carbon::parse($event->date)->format('d/m/Y') }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-map-marker-alt text-primary me-3 fs-5"></i>
+                                <div>
+                                    <strong>Lieu</strong><br>
+                                    {{ $event->ville }}, {{ $event->pays }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-tag text-primary me-3 fs-5"></i>
+                                <div>
+                                    <strong>Type</strong><br>
+                                    {{ $event->type }}
+                                </div>
+                            </div>
+                        </div>
+                        @if($event->email)
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-envelope text-primary me-3 fs-5"></i>
+                                <div>
+                                    <strong>Contact</strong><br>
+                                    {{ $event->email }}
+                                </div>
+                            </div>
+                        </div>
+                        @endif  
+                    </div>
+                </div>
+
+
             </div>
 
             <div class="col-lg-4">
+              
+                <!-- Contact Info -->
+                @if($event->email || $event->tel || $event->site_web)
                 <div class="sidebar">
-                    <h5 class="text-center mb-3">Rendez-vous sur la ligne de départ !</h5>
-                    <img src="{{ asset('storage/' . $event->image_couverture) }}" alt="Event Image">
-                    <div class="mt-3">
-                        <h6><i class="fas fa-map-marker-alt me-2"></i>Lieu</h6>
-                        <p class="mb-0">{{ $event->ville }}</p>
+                    <h5 class="mb-3">Contact organisateur</h5>
+                    @if($event->email)
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-envelope text-primary me-2"></i>
+                        <a href="mailto:{{ $event->email }}" class="text-decoration-none">{{ $event->email }}</a>
                     </div>
+                    @endif
+                    @if($event->tel)
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-phone text-primary me-2"></i>
+                        <a href="tel:{{ $event->tel }}" class="text-decoration-none">{{ $event->tel }}</a>
+                    </div>
+                    @endif
+                    @if($event->site_web)
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-globe text-primary me-2"></i>
+                        <a href="{{ $event->site_web }}" target="_blank" class="text-decoration-none">Site web</a>
+                    </div>
+                    @endif
                 </div>
+                @endif
             </div>
         </div>
     </div>

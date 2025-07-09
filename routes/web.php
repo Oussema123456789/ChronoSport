@@ -248,6 +248,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 // Route de test temporaire sans authentification
 Route::get('/test-form-config/{event}/edit', [FormConfigurationController::class, 'edit'])->name('test.form-config.edit');
 Route::put('/test-form-config/{event}', [FormConfigurationController::class, 'update'])->name('test.form-config.update');
+
+// Route de test pour les images
+Route::get('/test-sponsors/{event}', function($eventId) {
+    $event = \App\Models\Event::findOrFail($eventId);
+    $sponsors = \App\Models\Sponsor::where('evenement_id', $eventId)->get();
+    return view('test-sponsors-display', compact('event', 'sponsors'));
+});
 //diplome
 Route::get('/diplome/{id}', [ResultatController::class, 'downloadDiplome'])->name('diplome.show');
 

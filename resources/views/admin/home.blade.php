@@ -456,11 +456,10 @@
         <div class="parent-icon">
             <i class="bx bx-calendar"></i> <!-- Icon for Evenement -->
         </div>
-        <div class="menu-title">Dossard</div>
+        <div class="menu-title">Dossards</div>
     </a>
     <ul>
-        <li><a href="{{ route('admin.event.index') }}"><i class="bx bx-detail"></i> Evenement Details</a></li>
-        <li><a href="{{ route('evenements.create') }}"><i class="bx bx-plus-circle"></i> Add New Evenements</a></li>
+        <li><a href="{{ route('admin.dossards.index') }}"><i class="bx bx-detail"></i> Conception des Dossards</a></li>
     </ul>
 </li>
 
@@ -682,65 +681,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <script>
-$(document).ready(function () {
-    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
 
-    const eventCounts = @json($eventCountsByMonth);
-    const inscriptionCounts = @json($inscriptionCountsByMonth);
-
-    const eventsCtx = document.getElementById('eventChart');
-    const inscriptionsCtx = document.getElementById('inscriptionChart');
-
-    if (eventsCtx) {
-        new Chart(eventsCtx.getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: months,
-                datasets: [{
-                    label: 'Évènements',
-                    data: eventCounts,
-                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true, precision: 0 }
-                },
-                plugins: { legend: { display: false } }
-            }
-        });
-    } else {
-        console.warn('eventsChart not found');
-    }
-
-    if (inscriptionsCtx) {
-        new Chart(inscriptionsCtx.getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: months,
-                datasets: [{
-                    label: 'Inscriptions',
-                    data: inscriptionCounts,
-                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true, precision: 0 }
-                },
-                plugins: { legend: { display: false } }
-            }
-        });
-    } else {
-        console.warn('inscriptionsChart not found');
-    }
-});
 </script>
 
 @endpush

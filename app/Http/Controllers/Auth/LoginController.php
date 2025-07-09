@@ -25,7 +25,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/admin/home';
 
     /**
      * Create a new controller instance.
@@ -36,5 +36,15 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
         $this->middleware('auth')->only('logout');
+    }
+
+    /**
+     * Where to redirect users after logout.
+     *
+     * @return string
+     */
+    protected function loggedOut()
+    {
+        return redirect('/login')->with('status', 'Vous avez été déconnecté avec succès.');
     }
 }

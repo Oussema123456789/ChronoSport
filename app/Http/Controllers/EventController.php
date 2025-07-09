@@ -168,7 +168,13 @@ public function index(Request $request)
     }
 public function show(Event $event)
 {
-    $event->load('sponsors'); // Eager load sponsors
+    // Eager load all necessary relationships
+    $event->load([
+        'sponsors',
+        'epreuves.inscriptions',
+        'arbitres'
+    ]);
+
     return view('admin.event.show', compact('event'));
 }
 

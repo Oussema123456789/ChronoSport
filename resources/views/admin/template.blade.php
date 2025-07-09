@@ -389,7 +389,13 @@
                             <li>
                                 <div class="dropdown-divider mb-0"></div>
                             </li>
-                            <li><a class="dropdown-item" href="javascript:;"><i class='bx bx-log-out-circle'></i><span>Logout</span></a>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item" style="border: none; background: none; width: 100%; text-align: left;">
+                                        <i class='bx bx-log-out-circle'></i><span>Logout</span>
+                                    </button>
+                                </form>
                             </li>
                         </ul>
                     </div>
@@ -431,6 +437,19 @@
         </a>
     </li>
 
+    <li class="menu-label">Outils Généraux</li>
+    <li>
+        <a href="javascript:;" class="has-arrow">
+            <div class="parent-icon">
+                <i class="bx bx-id-card"></i>
+            </div>
+            <div class="menu-title">Dossards</div>
+        </a>
+        <ul>
+            <li><a href="{{ route('admin.dossards.index') }}"><i class="bx bx-detail"></i> Conception des Dossards</a></li>
+        </ul>
+    </li>
+
     <li class="menu-label">Arbitrage</li>
     <li>
         <a href="javascript:;" class="has-arrow">
@@ -447,20 +466,49 @@
     </li>
 
     @if(isset($event))
+    <!-- En-tête de l'événement sélectionné -->
+    <li class="menu-label">Événement : {{ $event->nom }}</li>
+
+    <li>
+        <a href="{{ route('admin.template', $event->id) }}">
+            <div class="parent-icon"><i class='bx bx-home'></i></div>
+            <div class="menu-title">Tableau de Bord</div>
+        </a>
+    </li>
+
     <li>
         <a href="javascript:;" class="has-arrow">
             <div class="parent-icon"><i class='bx bx-run'></i></div>
-            <div class="menu-title">Epreuves</div>
+            <div class="menu-title">Épreuves</div>
         </a>
         <ul>
             <li>
                 <a href="{{ route('events.epreuves.index', $event->id) }}">
-                    <i class="bx bx-list-ul"></i>Liste des Epreuves
+                    <i class="bx bx-list-ul"></i>Liste des Épreuves
                 </a>
             </li>
             <li>
                 <a href="{{ route('events.epreuves.create', $event->id) }}">
-                    <i class="bx bx-plus-circle"></i>Ajouter Epreuves
+                    <i class="bx bx-plus-circle"></i>Ajouter Épreuve
+                </a>
+            </li>
+        </ul>
+    </li>
+
+    <li>
+        <a href="javascript:;" class="has-arrow">
+            <div class="parent-icon"><i class='bx bx-building-house'></i></div>
+            <div class="menu-title">Sponsors</div>
+        </a>
+        <ul>
+            <li>
+                <a href="{{ route('events.sponsors.index', $event->id) }}">
+                    <i class="bx bx-list-ul"></i>Liste des Sponsors
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('events.sponsors.create', $event->id) }}">
+                    <i class="bx bx-plus-circle"></i>Ajouter Sponsor
                 </a>
             </li>
         </ul>
@@ -472,7 +520,6 @@
             <div class="menu-title">Configuration Formulaire</div>
         </a>
     </li>
-    @endif
 
     <li>
         <a href="javascript:;" class="has-arrow">
@@ -481,17 +528,15 @@
         </a>
         <ul>
             <li>
-                <a href="{{ route('admin.dossards.index') }}">
-                    <i class="bx bx-list-ul"></i>Gestion des Dossards
-                </a>
-            </li>
-            <li>
                 <a href="{{ route('admin.dossards.create') }}">
-                    <i class="bx bx-plus-circle"></i>Concevoir Dossards
+                    <i class="bx bx-plus-circle"></i>Générer Dossards
                 </a>
             </li>
         </ul>
     </li>
+    @endif
+
+
 
     <li class="menu-label">Résultat</li>
 @if(isset($epreuves))

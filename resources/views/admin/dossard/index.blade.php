@@ -1,4 +1,4 @@
-@extends('admin.home1')
+@extends('admin.home')
 
 @section('contenu')
 <div class="page-wrapper">
